@@ -1,0 +1,46 @@
+void func();
+
+int main(){
+    int arr[5]={1,2,3,4,5};
+    int INTEGER = 1023; int OCTAL = 0x123aF; 
+    float FLOATINGS1 = 1.2303; float FLOATINGS2 = 0.123;
+    /*right string*/
+    string s1 = 'string';     
+    //wrong string
+    string s2 = 'wrong
+                 string';     
+    //wrong string
+    string s3 = 'wrong
+                 string ;     
+
+    /*set of operators*/
+    =+-*                     
+    /*set of operators*/
+    /%==!=<><=>=!&&||();{}[]    
+
+    //characters which are not in SysY set
+    `~#$^:                     
+
+    //right identifiers
+    _1dw             
+    //wrong identifiers
+    1er                         
+
+    if(a + b >= 2 || a <= 0){
+        int c = 5;
+        while(c = c - 1){
+            a++;
+            if(c  == 3){
+                break;
+            }
+            else{
+                continue;
+            }
+        }
+    }
+    else{
+        b--;
+    }
+    return 0;
+
+/* wrongcomment
