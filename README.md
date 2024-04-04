@@ -1,5 +1,3 @@
-# SCUT_OPTIMIZE
-
 # Installation
 
 ### Requirements
