@@ -1,0 +1,2395 @@
+Grammar
+
+    0 $accept: CompUnit $end
+
+    1 CompUnit: CompUnit Decl
+    2         | CompUnit FuncDef
+    3         | Decl
+    4         | FuncDef
+
+    5 Decl: ConstDecl TOK_SEMICOLON
+    6     | VarDecl TOK_SEMICOLON
+
+    7 BType: TOK_INT
+    8      | TOK_FLOAT
+
+    9 ConstDecl: TOK_CONST BType ConstDef
+   10          | ConstDecl TOK_COMMA ConstDef
+
+   11 VarDecl: BType VarDef
+   12        | VarDecl TOK_COMMA VarDef
+
+   13 VarDef: VarDefSingle
+   14       | VarDefArray
+
+   15 VarDefSingle: IDENT TOK_ASSIGN InitVal
+   16             | IDENT
+
+   17 VarDefArray: DefArrayBody TOK_ASSIGN InitValArray
+   18            | DefArrayBody
+
+   19 DefArrayBody: DefArrayBody TOK_LBRACKET Exp TOK_RBRACKET
+   20             | IDENT TOK_LBRACKET Exp TOK_RBRACKET
+
+   21 ConstDef: ConstDefSingle
+   22         | ConstDefArray
+
+   23 ConstDefSingle: IDENT TOK_ASSIGN InitVal
+
+   24 ConstDefArray: DefArrayBody TOK_ASSIGN InitValArray
+
+   25 InitVal: AddExp
+
+   26 InitValArray: TOK_LBRACE InitValArrayBody TOK_RBRACE
+   27             | TOK_LBRACE TOK_RBRACE
+
+   28 InitValArrayBody: InitValArrayBody TOK_COMMA InitValArray
+   29                 | InitValArrayBody TOK_COMMA InitVal
+   30                 | InitValArray
+   31                 | InitVal
+
+   32 Exp: AddExp
+
+   33 LOrExp: LOrExp TOK_OR LAndExp
+   34       | LAndExp
+
+   35 LAndExp: EqExp
+   36        | LAndExp TOK_AND EqExp
+
+   37 EqExp: RelExp
+   38      | EqExp TOK_EQ RelExp
+   39      | EqExp TOK_NEQ RelExp
+
+   40 RelExp: AddExp
+   41       | RelExp RelOp AddExp
+
+   42 AddExp: MulExp
+   43       | AddExp AddOp MulExp
+
+   44 MulExp: UnaryExp
+   45       | MulExp MulOp UnaryExp
+
+   46 UnaryExp: PrimaryExp
+   47         | FuncCall
+   48         | UnaryOp UnaryExp
+
+   49 FuncCall: IDENT TOK_LPAREN FuncRParams TOK_RPAREN
+   50         | IDENT TOK_LPAREN TOK_RPAREN
+
+   51 PrimaryExp: TOK_LPAREN Exp TOK_RPAREN
+   52           | LVal
+   53           | Number
+
+   54 LVal: LVal TOK_LBRACKET Exp TOK_RBRACKET
+   55     | IDENT
+
+   56 FuncDef: TOK_VOID IDENT TOK_LPAREN FuncFParams TOK_RPAREN Block
+   57        | TOK_VOID IDENT TOK_LPAREN TOK_RPAREN Block
+   58        | BType IDENT TOK_LPAREN FuncFParams TOK_RPAREN Block
+   59        | BType IDENT TOK_LPAREN TOK_RPAREN Block
+
+   60 FuncFParams: FuncFParams TOK_COMMA FuncFParam
+   61            | FuncFParam
+
+   62 FuncRParams: FuncRParams TOK_COMMA AddExp
+   63            | AddExp
+
+   64 FuncFParam: FuncFParamSingle
+   65           | FuncFParamArray
+
+   66 FuncFParamSingle: BType IDENT
+
+   67 FuncFParamArray: BType IDENT TOK_LBRACKET TOK_RBRACKET
+   68                | FuncFParamArray TOK_LBRACKET Exp TOK_RBRACKET
+
+   69 Block: TOK_LBRACE TOK_RBRACE
+   70      | TOK_LBRACE BlockItems TOK_RBRACE
+
+   71 BlockItems: BlockItem
+   72           | BlockItems BlockItem
+
+   73 BlockItem: Decl
+   74          | Stmt
+
+   75 Stmt: LVal TOK_ASSIGN Exp TOK_SEMICOLON
+   76     | Exp TOK_SEMICOLON
+   77     | TOK_SEMICOLON
+   78     | Block
+   79     | IfStmt
+   80     | WhileStmt
+   81     | BreakStmt
+   82     | ContinueStmt
+   83     | ReturnStmt
+
+   84 IfStmt: TOK_IF TOK_LPAREN Cond TOK_RPAREN Stmt TOK_ELSE Stmt
+   85       | TOK_IF TOK_LPAREN Cond TOK_RPAREN Stmt
+
+   86 ReturnStmt: TOK_RETURN Exp TOK_SEMICOLON
+   87           | TOK_RETURN TOK_SEMICOLON
+
+   88 WhileStmt: TOK_WHILE TOK_LPAREN Cond TOK_RPAREN Stmt
+
+   89 BreakStmt: TOK_BREAK TOK_SEMICOLON
+
+   90 ContinueStmt: TOK_CONTINUE TOK_SEMICOLON
+
+   91 Cond: LOrExp
+
+   92 Number: TOK_INT_CONST
+   93       | TOK_FLOAT_CONST
+
+   94 AddOp: TOK_PLUS
+   95      | TOK_MINUS
+
+   96 MulOp: TOK_MUL
+   97      | TOK_DIV
+   98      | TOK_MOD
+
+   99 UnaryOp: TOK_PLUS
+  100        | TOK_MINUS
+  101        | TOK_NOT
+
+  102 RelOp: TOK_GE
+  103      | TOK_GEQ
+  104      | TOK_LE
+  105      | TOK_LEQ
+
+  106 IDENT: TOK_IDENT
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256)
+TOK_IDENT (258) 106
+TOK_INT_CONST (259) 92
+TOK_FLOAT_CONST (260) 93
+TOK_CONST (261) 9
+TOK_INT (262) 7
+TOK_FLOAT (263) 8
+TOK_COMMA (264) 10 12 28 29 60 62
+TOK_SEMICOLON (265) 5 6 75 76 77 86 87 89 90
+TOK_LBRACE (266) 26 27 69 70
+TOK_RBRACE (267) 26 27 69 70
+TOK_LBRACKET (268) 19 20 54 67 68
+TOK_RBRACKET (269) 19 20 54 67 68
+TOK_LPAREN (270) 49 50 51 56 57 58 59 84 85 88
+TOK_RPAREN (271) 49 50 51 56 57 58 59 84 85 88
+TOK_ASSIGN (272) 15 17 23 24 75
+TOK_VOID (273) 56 57
+TOK_IF (274) 84 85
+TOK_ELSE (275) 84
+TOK_WHILE (276) 88
+TOK_BREAK (277) 89
+TOK_CONTINUE (278) 90
+TOK_RETURN (279) 86 87
+TOK_PLUS (280) 94 99
+TOK_MINUS (281) 95 100
+TOK_MUL (282) 96
+TOK_DIV (283) 97
+TOK_MOD (284) 98
+TOK_GE (285) 102
+TOK_GEQ (286) 103
+TOK_LE (287) 104
+TOK_LEQ (288) 105
+TOK_EQ (289) 38
+TOK_NEQ (290) 39
+TOK_AND (291) 36
+TOK_OR (292) 33
+TOK_NOT (293) 101
+"then" (294)
+
+
+Nonterminals, with rules where they appear
+
+$accept (40)
+    on left: 0
+CompUnit (41)
+    on left: 1 2 3 4, on right: 0 1 2
+Decl (42)
+    on left: 5 6, on right: 1 3 73
+BType (43)
+    on left: 7 8, on right: 9 11 58 59 66 67
+ConstDecl (44)
+    on left: 9 10, on right: 5 10
+VarDecl (45)
+    on left: 11 12, on right: 6 12
+VarDef (46)
+    on left: 13 14, on right: 11 12
+VarDefSingle (47)
+    on left: 15 16, on right: 13
+VarDefArray (48)
+    on left: 17 18, on right: 14
+DefArrayBody (49)
+    on left: 19 20, on right: 17 18 19 24
+ConstDef (50)
+    on left: 21 22, on right: 9 10
+ConstDefSingle (51)
+    on left: 23, on right: 21
+ConstDefArray (52)
+    on left: 24, on right: 22
+InitVal (53)
+    on left: 25, on right: 15 23 29 31
+InitValArray (54)
+    on left: 26 27, on right: 17 24 28 30
+InitValArrayBody (55)
+    on left: 28 29 30 31, on right: 26 28 29
+Exp (56)
+    on left: 32, on right: 19 20 51 54 68 75 76 86
+LOrExp (57)
+    on left: 33 34, on right: 33 91
+LAndExp (58)
+    on left: 35 36, on right: 33 34 36
+EqExp (59)
+    on left: 37 38 39, on right: 35 36 38 39
+RelExp (60)
+    on left: 40 41, on right: 37 38 39 41
+AddExp (61)
+    on left: 42 43, on right: 25 32 40 41 43 62 63
+MulExp (62)
+    on left: 44 45, on right: 42 43 45
+UnaryExp (63)
+    on left: 46 47 48, on right: 44 45 48
+FuncCall (64)
+    on left: 49 50, on right: 47
+PrimaryExp (65)
+    on left: 51 52 53, on right: 46
+LVal (66)
+    on left: 54 55, on right: 52 54 75
+FuncDef (67)
+    on left: 56 57 58 59, on right: 2 4
+FuncFParams (68)
+    on left: 60 61, on right: 56 58 60
+FuncRParams (69)
+    on left: 62 63, on right: 49 62
+FuncFParam (70)
+    on left: 64 65, on right: 60 61
+FuncFParamSingle (71)
+    on left: 66, on right: 64
+FuncFParamArray (72)
+    on left: 67 68, on right: 65 68
+Block (73)
+    on left: 69 70, on right: 56 57 58 59 78
+BlockItems (74)
+    on left: 71 72, on right: 70 72
+BlockItem (75)
+    on left: 73 74, on right: 71 72
+Stmt (76)
+    on left: 75 76 77 78 79 80 81 82 83, on right: 74 84 85 88
+IfStmt (77)
+    on left: 84 85, on right: 79
+ReturnStmt (78)
+    on left: 86 87, on right: 83
+WhileStmt (79)
+    on left: 88, on right: 80
+BreakStmt (80)
+    on left: 89, on right: 81
+ContinueStmt (81)
+    on left: 90, on right: 82
+Cond (82)
+    on left: 91, on right: 84 85 88
+Number (83)
+    on left: 92 93, on right: 53
+AddOp (84)
+    on left: 94 95, on right: 43
+MulOp (85)
+    on left: 96 97 98, on right: 45
+UnaryOp (86)
+    on left: 99 100 101, on right: 48
+RelOp (87)
+    on left: 102 103 104 105, on right: 41
+IDENT (88)
+    on left: 106, on right: 15 16 20 23 49 50 55 56 57 58 59 66 67
+
+
+state 0
+
+    0 $accept: . CompUnit $end
+
+    TOK_CONST  shift, and go to state 1
+    TOK_INT    shift, and go to state 2
+    TOK_FLOAT  shift, and go to state 3
+    TOK_VOID   shift, and go to state 4
+
+    CompUnit   go to state 5
+    Decl       go to state 6
+    BType      go to state 7
+    ConstDecl  go to state 8
+    VarDecl    go to state 9
+    FuncDef    go to state 10
+
+
+state 1
+
+    9 ConstDecl: TOK_CONST . BType ConstDef
+
+    TOK_INT    shift, and go to state 2
+    TOK_FLOAT  shift, and go to state 3
+
+    BType  go to state 11
+
+
+state 2
+
+    7 BType: TOK_INT .
+
+    $default  reduce using rule 7 (BType)
+
+
+state 3
+
+    8 BType: TOK_FLOAT .
+
+    $default  reduce using rule 8 (BType)
+
+
+state 4
+
+   56 FuncDef: TOK_VOID . IDENT TOK_LPAREN FuncFParams TOK_RPAREN Block
+   57        | TOK_VOID . IDENT TOK_LPAREN TOK_RPAREN Block
+
+    TOK_IDENT  shift, and go to state 12
+
+    IDENT  go to state 13
+
+
+state 5
+
+    0 $accept: CompUnit . $end
+    1 CompUnit: CompUnit . Decl
+    2         | CompUnit . FuncDef
+
+    $end       shift, and go to state 14
+    TOK_CONST  shift, and go to state 1
+    TOK_INT    shift, and go to state 2
+    TOK_FLOAT  shift, and go to state 3
+    TOK_VOID   shift, and go to state 4
+
+    Decl       go to state 15
+    BType      go to state 7
+    ConstDecl  go to state 8
+    VarDecl    go to state 9
+    FuncDef    go to state 16
+
+
+state 6
+
+    3 CompUnit: Decl .
+
+    $default  reduce using rule 3 (CompUnit)
+
+
+state 7
+
+   11 VarDecl: BType . VarDef
+   58 FuncDef: BType . IDENT TOK_LPAREN FuncFParams TOK_RPAREN Block
+   59        | BType . IDENT TOK_LPAREN TOK_RPAREN Block
+
+    TOK_IDENT  shift, and go to state 12
+
+    VarDef        go to state 17
+    VarDefSingle  go to state 18
+    VarDefArray   go to state 19
+    DefArrayBody  go to state 20
+    IDENT         go to state 21
+
+
+state 8
+
+    5 Decl: ConstDecl . TOK_SEMICOLON
+   10 ConstDecl: ConstDecl . TOK_COMMA ConstDef
+
+    TOK_COMMA      shift, and go to state 22
+    TOK_SEMICOLON  shift, and go to state 23
+
+
+state 9
+
+    6 Decl: VarDecl . TOK_SEMICOLON
+   12 VarDecl: VarDecl . TOK_COMMA VarDef
+
+    TOK_COMMA      shift, and go to state 24
+    TOK_SEMICOLON  shift, and go to state 25
+
+
+state 10
+
+    4 CompUnit: FuncDef .
+
+    $default  reduce using rule 4 (CompUnit)
+
+
+state 11
+
+    9 ConstDecl: TOK_CONST BType . ConstDef
+
+    TOK_IDENT  shift, and go to state 12
+
+    DefArrayBody    go to state 26
+    ConstDef        go to state 27
+    ConstDefSingle  go to state 28
+    ConstDefArray   go to state 29
+    IDENT           go to state 30
+
+
+state 12
+
+  106 IDENT: TOK_IDENT .
+
+    $default  reduce using rule 106 (IDENT)
+
+
+state 13
+
+   56 FuncDef: TOK_VOID IDENT . TOK_LPAREN FuncFParams TOK_RPAREN Block
+   57        | TOK_VOID IDENT . TOK_LPAREN TOK_RPAREN Block
+
+    TOK_LPAREN  shift, and go to state 31
+
+
+state 14
+
+    0 $accept: CompUnit $end .
+
+    $default  accept
+
+
+state 15
+
+    1 CompUnit: CompUnit Decl .
+
+    $default  reduce using rule 1 (CompUnit)
+
+
+state 16
+
+    2 CompUnit: CompUnit FuncDef .
+
+    $default  reduce using rule 2 (CompUnit)
+
+
+state 17
+
+   11 VarDecl: BType VarDef .
+
+    $default  reduce using rule 11 (VarDecl)
+
+
+state 18
+
+   13 VarDef: VarDefSingle .
+
+    $default  reduce using rule 13 (VarDef)
+
+
+state 19
+
+   14 VarDef: VarDefArray .
+
+    $default  reduce using rule 14 (VarDef)
+
+
+state 20
+
+   17 VarDefArray: DefArrayBody . TOK_ASSIGN InitValArray
+   18            | DefArrayBody .
+   19 DefArrayBody: DefArrayBody . TOK_LBRACKET Exp TOK_RBRACKET
+
+    TOK_LBRACKET  shift, and go to state 32
+    TOK_ASSIGN    shift, and go to state 33
+
+    $default  reduce using rule 18 (VarDefArray)
+
+
+state 21
+
+   15 VarDefSingle: IDENT . TOK_ASSIGN InitVal
+   16             | IDENT .
+   20 DefArrayBody: IDENT . TOK_LBRACKET Exp TOK_RBRACKET
+   58 FuncDef: BType IDENT . TOK_LPAREN FuncFParams TOK_RPAREN Block
+   59        | BType IDENT . TOK_LPAREN TOK_RPAREN Block
+
+    TOK_LBRACKET  shift, and go to state 34
+    TOK_LPAREN    shift, and go to state 35
+    TOK_ASSIGN    shift, and go to state 36
+
+    $default  reduce using rule 16 (VarDefSingle)
+
+
+state 22
+
+   10 ConstDecl: ConstDecl TOK_COMMA . ConstDef
+
+    TOK_IDENT  shift, and go to state 12
+
+    DefArrayBody    go to state 26
+    ConstDef        go to state 37
+    ConstDefSingle  go to state 28
+    ConstDefArray   go to state 29
+    IDENT           go to state 30
+
+
+state 23
+
+    5 Decl: ConstDecl TOK_SEMICOLON .
+
+    $default  reduce using rule 5 (Decl)
+
+
+state 24
+
+   12 VarDecl: VarDecl TOK_COMMA . VarDef
+
+    TOK_IDENT  shift, and go to state 12
+
+    VarDef        go to state 38
+    VarDefSingle  go to state 18
+    VarDefArray   go to state 19
+    DefArrayBody  go to state 20
+    IDENT         go to state 39
+
+
+state 25
+
+    6 Decl: VarDecl TOK_SEMICOLON .
+
+    $default  reduce using rule 6 (Decl)
+
+
+state 26
+
+   19 DefArrayBody: DefArrayBody . TOK_LBRACKET Exp TOK_RBRACKET
+   24 ConstDefArray: DefArrayBody . TOK_ASSIGN InitValArray
+
+    TOK_LBRACKET  shift, and go to state 32
+    TOK_ASSIGN    shift, and go to state 40
+
+
+state 27
+
+    9 ConstDecl: TOK_CONST BType ConstDef .
+
+    $default  reduce using rule 9 (ConstDecl)
+
+
+state 28
+
+   21 ConstDef: ConstDefSingle .
+
+    $default  reduce using rule 21 (ConstDef)
+
+
+state 29
+
+   22 ConstDef: ConstDefArray .
+
+    $default  reduce using rule 22 (ConstDef)
+
+
+state 30
+
+   20 DefArrayBody: IDENT . TOK_LBRACKET Exp TOK_RBRACKET
+   23 ConstDefSingle: IDENT . TOK_ASSIGN InitVal
+
+    TOK_LBRACKET  shift, and go to state 34
+    TOK_ASSIGN    shift, and go to state 41
+
+
+state 31
+
+   56 FuncDef: TOK_VOID IDENT TOK_LPAREN . FuncFParams TOK_RPAREN Block
+   57        | TOK_VOID IDENT TOK_LPAREN . TOK_RPAREN Block
+
+    TOK_INT     shift, and go to state 2
+    TOK_FLOAT   shift, and go to state 3
+    TOK_RPAREN  shift, and go to state 42
+
+    BType             go to state 43
+    FuncFParams       go to state 44
+    FuncFParam        go to state 45
+    FuncFParamSingle  go to state 46
+    FuncFParamArray   go to state 47
+
+
+state 32
+
+   19 DefArrayBody: DefArrayBody TOK_LBRACKET . Exp TOK_RBRACKET
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp         go to state 54
+    AddExp      go to state 55
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 33
+
+   17 VarDefArray: DefArrayBody TOK_ASSIGN . InitValArray
+
+    TOK_LBRACE  shift, and go to state 64
+
+    InitValArray  go to state 65
+
+
+state 34
+
+   20 DefArrayBody: IDENT TOK_LBRACKET . Exp TOK_RBRACKET
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp         go to state 66
+    AddExp      go to state 55
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 35
+
+   58 FuncDef: BType IDENT TOK_LPAREN . FuncFParams TOK_RPAREN Block
+   59        | BType IDENT TOK_LPAREN . TOK_RPAREN Block
+
+    TOK_INT     shift, and go to state 2
+    TOK_FLOAT   shift, and go to state 3
+    TOK_RPAREN  shift, and go to state 67
+
+    BType             go to state 43
+    FuncFParams       go to state 68
+    FuncFParam        go to state 45
+    FuncFParamSingle  go to state 46
+    FuncFParamArray   go to state 47
+
+
+state 36
+
+   15 VarDefSingle: IDENT TOK_ASSIGN . InitVal
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    InitVal     go to state 69
+    AddExp      go to state 70
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 37
+
+   10 ConstDecl: ConstDecl TOK_COMMA ConstDef .
+
+    $default  reduce using rule 10 (ConstDecl)
+
+
+state 38
+
+   12 VarDecl: VarDecl TOK_COMMA VarDef .
+
+    $default  reduce using rule 12 (VarDecl)
+
+
+state 39
+
+   15 VarDefSingle: IDENT . TOK_ASSIGN InitVal
+   16             | IDENT .
+   20 DefArrayBody: IDENT . TOK_LBRACKET Exp TOK_RBRACKET
+
+    TOK_LBRACKET  shift, and go to state 34
+    TOK_ASSIGN    shift, and go to state 36
+
+    $default  reduce using rule 16 (VarDefSingle)
+
+
+state 40
+
+   24 ConstDefArray: DefArrayBody TOK_ASSIGN . InitValArray
+
+    TOK_LBRACE  shift, and go to state 64
+
+    InitValArray  go to state 71
+
+
+state 41
+
+   23 ConstDefSingle: IDENT TOK_ASSIGN . InitVal
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    InitVal     go to state 72
+    AddExp      go to state 70
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 42
+
+   57 FuncDef: TOK_VOID IDENT TOK_LPAREN TOK_RPAREN . Block
+
+    TOK_LBRACE  shift, and go to state 73
+
+    Block  go to state 74
+
+
+state 43
+
+   66 FuncFParamSingle: BType . IDENT
+   67 FuncFParamArray: BType . IDENT TOK_LBRACKET TOK_RBRACKET
+
+    TOK_IDENT  shift, and go to state 12
+
+    IDENT  go to state 75
+
+
+state 44
+
+   56 FuncDef: TOK_VOID IDENT TOK_LPAREN FuncFParams . TOK_RPAREN Block
+   60 FuncFParams: FuncFParams . TOK_COMMA FuncFParam
+
+    TOK_COMMA   shift, and go to state 76
+    TOK_RPAREN  shift, and go to state 77
+
+
+state 45
+
+   61 FuncFParams: FuncFParam .
+
+    $default  reduce using rule 61 (FuncFParams)
+
+
+state 46
+
+   64 FuncFParam: FuncFParamSingle .
+
+    $default  reduce using rule 64 (FuncFParam)
+
+
+state 47
+
+   65 FuncFParam: FuncFParamArray .
+   68 FuncFParamArray: FuncFParamArray . TOK_LBRACKET Exp TOK_RBRACKET
+
+    TOK_LBRACKET  shift, and go to state 78
+
+    $default  reduce using rule 65 (FuncFParam)
+
+
+state 48
+
+   92 Number: TOK_INT_CONST .
+
+    $default  reduce using rule 92 (Number)
+
+
+state 49
+
+   93 Number: TOK_FLOAT_CONST .
+
+    $default  reduce using rule 93 (Number)
+
+
+state 50
+
+   51 PrimaryExp: TOK_LPAREN . Exp TOK_RPAREN
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp         go to state 79
+    AddExp      go to state 55
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 51
+
+   99 UnaryOp: TOK_PLUS .
+
+    $default  reduce using rule 99 (UnaryOp)
+
+
+state 52
+
+  100 UnaryOp: TOK_MINUS .
+
+    $default  reduce using rule 100 (UnaryOp)
+
+
+state 53
+
+  101 UnaryOp: TOK_NOT .
+
+    $default  reduce using rule 101 (UnaryOp)
+
+
+state 54
+
+   19 DefArrayBody: DefArrayBody TOK_LBRACKET Exp . TOK_RBRACKET
+
+    TOK_RBRACKET  shift, and go to state 80
+
+
+state 55
+
+   32 Exp: AddExp .
+   43 AddExp: AddExp . AddOp MulExp
+
+    TOK_PLUS   shift, and go to state 81
+    TOK_MINUS  shift, and go to state 82
+
+    $default  reduce using rule 32 (Exp)
+
+    AddOp  go to state 83
+
+
+state 56
+
+   42 AddExp: MulExp .
+   45 MulExp: MulExp . MulOp UnaryExp
+
+    TOK_MUL  shift, and go to state 84
+    TOK_DIV  shift, and go to state 85
+    TOK_MOD  shift, and go to state 86
+
+    $default  reduce using rule 42 (AddExp)
+
+    MulOp  go to state 87
+
+
+state 57
+
+   44 MulExp: UnaryExp .
+
+    $default  reduce using rule 44 (MulExp)
+
+
+state 58
+
+   47 UnaryExp: FuncCall .
+
+    $default  reduce using rule 47 (UnaryExp)
+
+
+state 59
+
+   46 UnaryExp: PrimaryExp .
+
+    $default  reduce using rule 46 (UnaryExp)
+
+
+state 60
+
+   52 PrimaryExp: LVal .
+   54 LVal: LVal . TOK_LBRACKET Exp TOK_RBRACKET
+
+    TOK_LBRACKET  shift, and go to state 88
+
+    $default  reduce using rule 52 (PrimaryExp)
+
+
+state 61
+
+   53 PrimaryExp: Number .
+
+    $default  reduce using rule 53 (PrimaryExp)
+
+
+state 62
+
+   48 UnaryExp: UnaryOp . UnaryExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    UnaryExp    go to state 89
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 63
+
+   49 FuncCall: IDENT . TOK_LPAREN FuncRParams TOK_RPAREN
+   50         | IDENT . TOK_LPAREN TOK_RPAREN
+   55 LVal: IDENT .
+
+    TOK_LPAREN  shift, and go to state 90
+
+    $default  reduce using rule 55 (LVal)
+
+
+state 64
+
+   26 InitValArray: TOK_LBRACE . InitValArrayBody TOK_RBRACE
+   27             | TOK_LBRACE . TOK_RBRACE
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LBRACE       shift, and go to state 64
+    TOK_RBRACE       shift, and go to state 91
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    InitVal           go to state 92
+    InitValArray      go to state 93
+    InitValArrayBody  go to state 94
+    AddExp            go to state 70
+    MulExp            go to state 56
+    UnaryExp          go to state 57
+    FuncCall          go to state 58
+    PrimaryExp        go to state 59
+    LVal              go to state 60
+    Number            go to state 61
+    UnaryOp           go to state 62
+    IDENT             go to state 63
+
+
+state 65
+
+   17 VarDefArray: DefArrayBody TOK_ASSIGN InitValArray .
+
+    $default  reduce using rule 17 (VarDefArray)
+
+
+state 66
+
+   20 DefArrayBody: IDENT TOK_LBRACKET Exp . TOK_RBRACKET
+
+    TOK_RBRACKET  shift, and go to state 95
+
+
+state 67
+
+   59 FuncDef: BType IDENT TOK_LPAREN TOK_RPAREN . Block
+
+    TOK_LBRACE  shift, and go to state 73
+
+    Block  go to state 96
+
+
+state 68
+
+   58 FuncDef: BType IDENT TOK_LPAREN FuncFParams . TOK_RPAREN Block
+   60 FuncFParams: FuncFParams . TOK_COMMA FuncFParam
+
+    TOK_COMMA   shift, and go to state 76
+    TOK_RPAREN  shift, and go to state 97
+
+
+state 69
+
+   15 VarDefSingle: IDENT TOK_ASSIGN InitVal .
+
+    $default  reduce using rule 15 (VarDefSingle)
+
+
+state 70
+
+   25 InitVal: AddExp .
+   43 AddExp: AddExp . AddOp MulExp
+
+    TOK_PLUS   shift, and go to state 81
+    TOK_MINUS  shift, and go to state 82
+
+    $default  reduce using rule 25 (InitVal)
+
+    AddOp  go to state 83
+
+
+state 71
+
+   24 ConstDefArray: DefArrayBody TOK_ASSIGN InitValArray .
+
+    $default  reduce using rule 24 (ConstDefArray)
+
+
+state 72
+
+   23 ConstDefSingle: IDENT TOK_ASSIGN InitVal .
+
+    $default  reduce using rule 23 (ConstDefSingle)
+
+
+state 73
+
+   69 Block: TOK_LBRACE . TOK_RBRACE
+   70      | TOK_LBRACE . BlockItems TOK_RBRACE
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_CONST        shift, and go to state 1
+    TOK_INT          shift, and go to state 2
+    TOK_FLOAT        shift, and go to state 3
+    TOK_SEMICOLON    shift, and go to state 98
+    TOK_LBRACE       shift, and go to state 73
+    TOK_RBRACE       shift, and go to state 99
+    TOK_LPAREN       shift, and go to state 50
+    TOK_IF           shift, and go to state 100
+    TOK_WHILE        shift, and go to state 101
+    TOK_BREAK        shift, and go to state 102
+    TOK_CONTINUE     shift, and go to state 103
+    TOK_RETURN       shift, and go to state 104
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Decl          go to state 105
+    BType         go to state 106
+    ConstDecl     go to state 8
+    VarDecl       go to state 9
+    Exp           go to state 107
+    AddExp        go to state 55
+    MulExp        go to state 56
+    UnaryExp      go to state 57
+    FuncCall      go to state 58
+    PrimaryExp    go to state 59
+    LVal          go to state 108
+    Block         go to state 109
+    BlockItems    go to state 110
+    BlockItem     go to state 111
+    Stmt          go to state 112
+    IfStmt        go to state 113
+    ReturnStmt    go to state 114
+    WhileStmt     go to state 115
+    BreakStmt     go to state 116
+    ContinueStmt  go to state 117
+    Number        go to state 61
+    UnaryOp       go to state 62
+    IDENT         go to state 63
+
+
+state 74
+
+   57 FuncDef: TOK_VOID IDENT TOK_LPAREN TOK_RPAREN Block .
+
+    $default  reduce using rule 57 (FuncDef)
+
+
+state 75
+
+   66 FuncFParamSingle: BType IDENT .
+   67 FuncFParamArray: BType IDENT . TOK_LBRACKET TOK_RBRACKET
+
+    TOK_LBRACKET  shift, and go to state 118
+
+    $default  reduce using rule 66 (FuncFParamSingle)
+
+
+state 76
+
+   60 FuncFParams: FuncFParams TOK_COMMA . FuncFParam
+
+    TOK_INT    shift, and go to state 2
+    TOK_FLOAT  shift, and go to state 3
+
+    BType             go to state 43
+    FuncFParam        go to state 119
+    FuncFParamSingle  go to state 46
+    FuncFParamArray   go to state 47
+
+
+state 77
+
+   56 FuncDef: TOK_VOID IDENT TOK_LPAREN FuncFParams TOK_RPAREN . Block
+
+    TOK_LBRACE  shift, and go to state 73
+
+    Block  go to state 120
+
+
+state 78
+
+   68 FuncFParamArray: FuncFParamArray TOK_LBRACKET . Exp TOK_RBRACKET
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp         go to state 121
+    AddExp      go to state 55
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 79
+
+   51 PrimaryExp: TOK_LPAREN Exp . TOK_RPAREN
+
+    TOK_RPAREN  shift, and go to state 122
+
+
+state 80
+
+   19 DefArrayBody: DefArrayBody TOK_LBRACKET Exp TOK_RBRACKET .
+
+    $default  reduce using rule 19 (DefArrayBody)
+
+
+state 81
+
+   94 AddOp: TOK_PLUS .
+
+    $default  reduce using rule 94 (AddOp)
+
+
+state 82
+
+   95 AddOp: TOK_MINUS .
+
+    $default  reduce using rule 95 (AddOp)
+
+
+state 83
+
+   43 AddExp: AddExp AddOp . MulExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    MulExp      go to state 123
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 84
+
+   96 MulOp: TOK_MUL .
+
+    $default  reduce using rule 96 (MulOp)
+
+
+state 85
+
+   97 MulOp: TOK_DIV .
+
+    $default  reduce using rule 97 (MulOp)
+
+
+state 86
+
+   98 MulOp: TOK_MOD .
+
+    $default  reduce using rule 98 (MulOp)
+
+
+state 87
+
+   45 MulExp: MulExp MulOp . UnaryExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    UnaryExp    go to state 124
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 88
+
+   54 LVal: LVal TOK_LBRACKET . Exp TOK_RBRACKET
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp         go to state 125
+    AddExp      go to state 55
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 89
+
+   48 UnaryExp: UnaryOp UnaryExp .
+
+    $default  reduce using rule 48 (UnaryExp)
+
+
+state 90
+
+   49 FuncCall: IDENT TOK_LPAREN . FuncRParams TOK_RPAREN
+   50         | IDENT TOK_LPAREN . TOK_RPAREN
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_RPAREN       shift, and go to state 126
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    AddExp       go to state 127
+    MulExp       go to state 56
+    UnaryExp     go to state 57
+    FuncCall     go to state 58
+    PrimaryExp   go to state 59
+    LVal         go to state 60
+    FuncRParams  go to state 128
+    Number       go to state 61
+    UnaryOp      go to state 62
+    IDENT        go to state 63
+
+
+state 91
+
+   27 InitValArray: TOK_LBRACE TOK_RBRACE .
+
+    $default  reduce using rule 27 (InitValArray)
+
+
+state 92
+
+   31 InitValArrayBody: InitVal .
+
+    $default  reduce using rule 31 (InitValArrayBody)
+
+
+state 93
+
+   30 InitValArrayBody: InitValArray .
+
+    $default  reduce using rule 30 (InitValArrayBody)
+
+
+state 94
+
+   26 InitValArray: TOK_LBRACE InitValArrayBody . TOK_RBRACE
+   28 InitValArrayBody: InitValArrayBody . TOK_COMMA InitValArray
+   29                 | InitValArrayBody . TOK_COMMA InitVal
+
+    TOK_COMMA   shift, and go to state 129
+    TOK_RBRACE  shift, and go to state 130
+
+
+state 95
+
+   20 DefArrayBody: IDENT TOK_LBRACKET Exp TOK_RBRACKET .
+
+    $default  reduce using rule 20 (DefArrayBody)
+
+
+state 96
+
+   59 FuncDef: BType IDENT TOK_LPAREN TOK_RPAREN Block .
+
+    $default  reduce using rule 59 (FuncDef)
+
+
+state 97
+
+   58 FuncDef: BType IDENT TOK_LPAREN FuncFParams TOK_RPAREN . Block
+
+    TOK_LBRACE  shift, and go to state 73
+
+    Block  go to state 131
+
+
+state 98
+
+   77 Stmt: TOK_SEMICOLON .
+
+    $default  reduce using rule 77 (Stmt)
+
+
+state 99
+
+   69 Block: TOK_LBRACE TOK_RBRACE .
+
+    $default  reduce using rule 69 (Block)
+
+
+state 100
+
+   84 IfStmt: TOK_IF . TOK_LPAREN Cond TOK_RPAREN Stmt TOK_ELSE Stmt
+   85       | TOK_IF . TOK_LPAREN Cond TOK_RPAREN Stmt
+
+    TOK_LPAREN  shift, and go to state 132
+
+
+state 101
+
+   88 WhileStmt: TOK_WHILE . TOK_LPAREN Cond TOK_RPAREN Stmt
+
+    TOK_LPAREN  shift, and go to state 133
+
+
+state 102
+
+   89 BreakStmt: TOK_BREAK . TOK_SEMICOLON
+
+    TOK_SEMICOLON  shift, and go to state 134
+
+
+state 103
+
+   90 ContinueStmt: TOK_CONTINUE . TOK_SEMICOLON
+
+    TOK_SEMICOLON  shift, and go to state 135
+
+
+state 104
+
+   86 ReturnStmt: TOK_RETURN . Exp TOK_SEMICOLON
+   87           | TOK_RETURN . TOK_SEMICOLON
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_SEMICOLON    shift, and go to state 136
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp         go to state 137
+    AddExp      go to state 55
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 105
+
+   73 BlockItem: Decl .
+
+    $default  reduce using rule 73 (BlockItem)
+
+
+state 106
+
+   11 VarDecl: BType . VarDef
+
+    TOK_IDENT  shift, and go to state 12
+
+    VarDef        go to state 17
+    VarDefSingle  go to state 18
+    VarDefArray   go to state 19
+    DefArrayBody  go to state 20
+    IDENT         go to state 39
+
+
+state 107
+
+   76 Stmt: Exp . TOK_SEMICOLON
+
+    TOK_SEMICOLON  shift, and go to state 138
+
+
+state 108
+
+   52 PrimaryExp: LVal .
+   54 LVal: LVal . TOK_LBRACKET Exp TOK_RBRACKET
+   75 Stmt: LVal . TOK_ASSIGN Exp TOK_SEMICOLON
+
+    TOK_LBRACKET  shift, and go to state 88
+    TOK_ASSIGN    shift, and go to state 139
+
+    $default  reduce using rule 52 (PrimaryExp)
+
+
+state 109
+
+   78 Stmt: Block .
+
+    $default  reduce using rule 78 (Stmt)
+
+
+state 110
+
+   70 Block: TOK_LBRACE BlockItems . TOK_RBRACE
+   72 BlockItems: BlockItems . BlockItem
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_CONST        shift, and go to state 1
+    TOK_INT          shift, and go to state 2
+    TOK_FLOAT        shift, and go to state 3
+    TOK_SEMICOLON    shift, and go to state 98
+    TOK_LBRACE       shift, and go to state 73
+    TOK_RBRACE       shift, and go to state 140
+    TOK_LPAREN       shift, and go to state 50
+    TOK_IF           shift, and go to state 100
+    TOK_WHILE        shift, and go to state 101
+    TOK_BREAK        shift, and go to state 102
+    TOK_CONTINUE     shift, and go to state 103
+    TOK_RETURN       shift, and go to state 104
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Decl          go to state 105
+    BType         go to state 106
+    ConstDecl     go to state 8
+    VarDecl       go to state 9
+    Exp           go to state 107
+    AddExp        go to state 55
+    MulExp        go to state 56
+    UnaryExp      go to state 57
+    FuncCall      go to state 58
+    PrimaryExp    go to state 59
+    LVal          go to state 108
+    Block         go to state 109
+    BlockItem     go to state 141
+    Stmt          go to state 112
+    IfStmt        go to state 113
+    ReturnStmt    go to state 114
+    WhileStmt     go to state 115
+    BreakStmt     go to state 116
+    ContinueStmt  go to state 117
+    Number        go to state 61
+    UnaryOp       go to state 62
+    IDENT         go to state 63
+
+
+state 111
+
+   71 BlockItems: BlockItem .
+
+    $default  reduce using rule 71 (BlockItems)
+
+
+state 112
+
+   74 BlockItem: Stmt .
+
+    $default  reduce using rule 74 (BlockItem)
+
+
+state 113
+
+   79 Stmt: IfStmt .
+
+    $default  reduce using rule 79 (Stmt)
+
+
+state 114
+
+   83 Stmt: ReturnStmt .
+
+    $default  reduce using rule 83 (Stmt)
+
+
+state 115
+
+   80 Stmt: WhileStmt .
+
+    $default  reduce using rule 80 (Stmt)
+
+
+state 116
+
+   81 Stmt: BreakStmt .
+
+    $default  reduce using rule 81 (Stmt)
+
+
+state 117
+
+   82 Stmt: ContinueStmt .
+
+    $default  reduce using rule 82 (Stmt)
+
+
+state 118
+
+   67 FuncFParamArray: BType IDENT TOK_LBRACKET . TOK_RBRACKET
+
+    TOK_RBRACKET  shift, and go to state 142
+
+
+state 119
+
+   60 FuncFParams: FuncFParams TOK_COMMA FuncFParam .
+
+    $default  reduce using rule 60 (FuncFParams)
+
+
+state 120
+
+   56 FuncDef: TOK_VOID IDENT TOK_LPAREN FuncFParams TOK_RPAREN Block .
+
+    $default  reduce using rule 56 (FuncDef)
+
+
+state 121
+
+   68 FuncFParamArray: FuncFParamArray TOK_LBRACKET Exp . TOK_RBRACKET
+
+    TOK_RBRACKET  shift, and go to state 143
+
+
+state 122
+
+   51 PrimaryExp: TOK_LPAREN Exp TOK_RPAREN .
+
+    $default  reduce using rule 51 (PrimaryExp)
+
+
+state 123
+
+   43 AddExp: AddExp AddOp MulExp .
+   45 MulExp: MulExp . MulOp UnaryExp
+
+    TOK_MUL  shift, and go to state 84
+    TOK_DIV  shift, and go to state 85
+    TOK_MOD  shift, and go to state 86
+
+    $default  reduce using rule 43 (AddExp)
+
+    MulOp  go to state 87
+
+
+state 124
+
+   45 MulExp: MulExp MulOp UnaryExp .
+
+    $default  reduce using rule 45 (MulExp)
+
+
+state 125
+
+   54 LVal: LVal TOK_LBRACKET Exp . TOK_RBRACKET
+
+    TOK_RBRACKET  shift, and go to state 144
+
+
+state 126
+
+   50 FuncCall: IDENT TOK_LPAREN TOK_RPAREN .
+
+    $default  reduce using rule 50 (FuncCall)
+
+
+state 127
+
+   43 AddExp: AddExp . AddOp MulExp
+   63 FuncRParams: AddExp .
+
+    TOK_PLUS   shift, and go to state 81
+    TOK_MINUS  shift, and go to state 82
+
+    $default  reduce using rule 63 (FuncRParams)
+
+    AddOp  go to state 83
+
+
+state 128
+
+   49 FuncCall: IDENT TOK_LPAREN FuncRParams . TOK_RPAREN
+   62 FuncRParams: FuncRParams . TOK_COMMA AddExp
+
+    TOK_COMMA   shift, and go to state 145
+    TOK_RPAREN  shift, and go to state 146
+
+
+state 129
+
+   28 InitValArrayBody: InitValArrayBody TOK_COMMA . InitValArray
+   29                 | InitValArrayBody TOK_COMMA . InitVal
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LBRACE       shift, and go to state 64
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    InitVal       go to state 147
+    InitValArray  go to state 148
+    AddExp        go to state 70
+    MulExp        go to state 56
+    UnaryExp      go to state 57
+    FuncCall      go to state 58
+    PrimaryExp    go to state 59
+    LVal          go to state 60
+    Number        go to state 61
+    UnaryOp       go to state 62
+    IDENT         go to state 63
+
+
+state 130
+
+   26 InitValArray: TOK_LBRACE InitValArrayBody TOK_RBRACE .
+
+    $default  reduce using rule 26 (InitValArray)
+
+
+state 131
+
+   58 FuncDef: BType IDENT TOK_LPAREN FuncFParams TOK_RPAREN Block .
+
+    $default  reduce using rule 58 (FuncDef)
+
+
+state 132
+
+   84 IfStmt: TOK_IF TOK_LPAREN . Cond TOK_RPAREN Stmt TOK_ELSE Stmt
+   85       | TOK_IF TOK_LPAREN . Cond TOK_RPAREN Stmt
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    LOrExp      go to state 149
+    LAndExp     go to state 150
+    EqExp       go to state 151
+    RelExp      go to state 152
+    AddExp      go to state 153
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Cond        go to state 154
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 133
+
+   88 WhileStmt: TOK_WHILE TOK_LPAREN . Cond TOK_RPAREN Stmt
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    LOrExp      go to state 149
+    LAndExp     go to state 150
+    EqExp       go to state 151
+    RelExp      go to state 152
+    AddExp      go to state 153
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Cond        go to state 155
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 134
+
+   89 BreakStmt: TOK_BREAK TOK_SEMICOLON .
+
+    $default  reduce using rule 89 (BreakStmt)
+
+
+state 135
+
+   90 ContinueStmt: TOK_CONTINUE TOK_SEMICOLON .
+
+    $default  reduce using rule 90 (ContinueStmt)
+
+
+state 136
+
+   87 ReturnStmt: TOK_RETURN TOK_SEMICOLON .
+
+    $default  reduce using rule 87 (ReturnStmt)
+
+
+state 137
+
+   86 ReturnStmt: TOK_RETURN Exp . TOK_SEMICOLON
+
+    TOK_SEMICOLON  shift, and go to state 156
+
+
+state 138
+
+   76 Stmt: Exp TOK_SEMICOLON .
+
+    $default  reduce using rule 76 (Stmt)
+
+
+state 139
+
+   75 Stmt: LVal TOK_ASSIGN . Exp TOK_SEMICOLON
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp         go to state 157
+    AddExp      go to state 55
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 140
+
+   70 Block: TOK_LBRACE BlockItems TOK_RBRACE .
+
+    $default  reduce using rule 70 (Block)
+
+
+state 141
+
+   72 BlockItems: BlockItems BlockItem .
+
+    $default  reduce using rule 72 (BlockItems)
+
+
+state 142
+
+   67 FuncFParamArray: BType IDENT TOK_LBRACKET TOK_RBRACKET .
+
+    $default  reduce using rule 67 (FuncFParamArray)
+
+
+state 143
+
+   68 FuncFParamArray: FuncFParamArray TOK_LBRACKET Exp TOK_RBRACKET .
+
+    $default  reduce using rule 68 (FuncFParamArray)
+
+
+state 144
+
+   54 LVal: LVal TOK_LBRACKET Exp TOK_RBRACKET .
+
+    $default  reduce using rule 54 (LVal)
+
+
+state 145
+
+   62 FuncRParams: FuncRParams TOK_COMMA . AddExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    AddExp      go to state 158
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 146
+
+   49 FuncCall: IDENT TOK_LPAREN FuncRParams TOK_RPAREN .
+
+    $default  reduce using rule 49 (FuncCall)
+
+
+state 147
+
+   29 InitValArrayBody: InitValArrayBody TOK_COMMA InitVal .
+
+    $default  reduce using rule 29 (InitValArrayBody)
+
+
+state 148
+
+   28 InitValArrayBody: InitValArrayBody TOK_COMMA InitValArray .
+
+    $default  reduce using rule 28 (InitValArrayBody)
+
+
+state 149
+
+   33 LOrExp: LOrExp . TOK_OR LAndExp
+   91 Cond: LOrExp .
+
+    TOK_OR  shift, and go to state 159
+
+    $default  reduce using rule 91 (Cond)
+
+
+state 150
+
+   34 LOrExp: LAndExp .
+   36 LAndExp: LAndExp . TOK_AND EqExp
+
+    TOK_AND  shift, and go to state 160
+
+    $default  reduce using rule 34 (LOrExp)
+
+
+state 151
+
+   35 LAndExp: EqExp .
+   38 EqExp: EqExp . TOK_EQ RelExp
+   39      | EqExp . TOK_NEQ RelExp
+
+    TOK_EQ   shift, and go to state 161
+    TOK_NEQ  shift, and go to state 162
+
+    $default  reduce using rule 35 (LAndExp)
+
+
+state 152
+
+   37 EqExp: RelExp .
+   41 RelExp: RelExp . RelOp AddExp
+
+    TOK_GE   shift, and go to state 163
+    TOK_GEQ  shift, and go to state 164
+    TOK_LE   shift, and go to state 165
+    TOK_LEQ  shift, and go to state 166
+
+    $default  reduce using rule 37 (EqExp)
+
+    RelOp  go to state 167
+
+
+state 153
+
+   40 RelExp: AddExp .
+   43 AddExp: AddExp . AddOp MulExp
+
+    TOK_PLUS   shift, and go to state 81
+    TOK_MINUS  shift, and go to state 82
+
+    $default  reduce using rule 40 (RelExp)
+
+    AddOp  go to state 83
+
+
+state 154
+
+   84 IfStmt: TOK_IF TOK_LPAREN Cond . TOK_RPAREN Stmt TOK_ELSE Stmt
+   85       | TOK_IF TOK_LPAREN Cond . TOK_RPAREN Stmt
+
+    TOK_RPAREN  shift, and go to state 168
+
+
+state 155
+
+   88 WhileStmt: TOK_WHILE TOK_LPAREN Cond . TOK_RPAREN Stmt
+
+    TOK_RPAREN  shift, and go to state 169
+
+
+state 156
+
+   86 ReturnStmt: TOK_RETURN Exp TOK_SEMICOLON .
+
+    $default  reduce using rule 86 (ReturnStmt)
+
+
+state 157
+
+   75 Stmt: LVal TOK_ASSIGN Exp . TOK_SEMICOLON
+
+    TOK_SEMICOLON  shift, and go to state 170
+
+
+state 158
+
+   43 AddExp: AddExp . AddOp MulExp
+   62 FuncRParams: FuncRParams TOK_COMMA AddExp .
+
+    TOK_PLUS   shift, and go to state 81
+    TOK_MINUS  shift, and go to state 82
+
+    $default  reduce using rule 62 (FuncRParams)
+
+    AddOp  go to state 83
+
+
+state 159
+
+   33 LOrExp: LOrExp TOK_OR . LAndExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    LAndExp     go to state 171
+    EqExp       go to state 151
+    RelExp      go to state 152
+    AddExp      go to state 153
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 160
+
+   36 LAndExp: LAndExp TOK_AND . EqExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    EqExp       go to state 172
+    RelExp      go to state 152
+    AddExp      go to state 153
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 161
+
+   38 EqExp: EqExp TOK_EQ . RelExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    RelExp      go to state 173
+    AddExp      go to state 153
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 162
+
+   39 EqExp: EqExp TOK_NEQ . RelExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    RelExp      go to state 174
+    AddExp      go to state 153
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 163
+
+  102 RelOp: TOK_GE .
+
+    $default  reduce using rule 102 (RelOp)
+
+
+state 164
+
+  103 RelOp: TOK_GEQ .
+
+    $default  reduce using rule 103 (RelOp)
+
+
+state 165
+
+  104 RelOp: TOK_LE .
+
+    $default  reduce using rule 104 (RelOp)
+
+
+state 166
+
+  105 RelOp: TOK_LEQ .
+
+    $default  reduce using rule 105 (RelOp)
+
+
+state 167
+
+   41 RelExp: RelExp RelOp . AddExp
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_LPAREN       shift, and go to state 50
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    AddExp      go to state 175
+    MulExp      go to state 56
+    UnaryExp    go to state 57
+    FuncCall    go to state 58
+    PrimaryExp  go to state 59
+    LVal        go to state 60
+    Number      go to state 61
+    UnaryOp     go to state 62
+    IDENT       go to state 63
+
+
+state 168
+
+   84 IfStmt: TOK_IF TOK_LPAREN Cond TOK_RPAREN . Stmt TOK_ELSE Stmt
+   85       | TOK_IF TOK_LPAREN Cond TOK_RPAREN . Stmt
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_SEMICOLON    shift, and go to state 98
+    TOK_LBRACE       shift, and go to state 73
+    TOK_LPAREN       shift, and go to state 50
+    TOK_IF           shift, and go to state 100
+    TOK_WHILE        shift, and go to state 101
+    TOK_BREAK        shift, and go to state 102
+    TOK_CONTINUE     shift, and go to state 103
+    TOK_RETURN       shift, and go to state 104
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp           go to state 107
+    AddExp        go to state 55
+    MulExp        go to state 56
+    UnaryExp      go to state 57
+    FuncCall      go to state 58
+    PrimaryExp    go to state 59
+    LVal          go to state 108
+    Block         go to state 109
+    Stmt          go to state 176
+    IfStmt        go to state 113
+    ReturnStmt    go to state 114
+    WhileStmt     go to state 115
+    BreakStmt     go to state 116
+    ContinueStmt  go to state 117
+    Number        go to state 61
+    UnaryOp       go to state 62
+    IDENT         go to state 63
+
+
+state 169
+
+   88 WhileStmt: TOK_WHILE TOK_LPAREN Cond TOK_RPAREN . Stmt
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_SEMICOLON    shift, and go to state 98
+    TOK_LBRACE       shift, and go to state 73
+    TOK_LPAREN       shift, and go to state 50
+    TOK_IF           shift, and go to state 100
+    TOK_WHILE        shift, and go to state 101
+    TOK_BREAK        shift, and go to state 102
+    TOK_CONTINUE     shift, and go to state 103
+    TOK_RETURN       shift, and go to state 104
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp           go to state 107
+    AddExp        go to state 55
+    MulExp        go to state 56
+    UnaryExp      go to state 57
+    FuncCall      go to state 58
+    PrimaryExp    go to state 59
+    LVal          go to state 108
+    Block         go to state 109
+    Stmt          go to state 177
+    IfStmt        go to state 113
+    ReturnStmt    go to state 114
+    WhileStmt     go to state 115
+    BreakStmt     go to state 116
+    ContinueStmt  go to state 117
+    Number        go to state 61
+    UnaryOp       go to state 62
+    IDENT         go to state 63
+
+
+state 170
+
+   75 Stmt: LVal TOK_ASSIGN Exp TOK_SEMICOLON .
+
+    $default  reduce using rule 75 (Stmt)
+
+
+state 171
+
+   33 LOrExp: LOrExp TOK_OR LAndExp .
+   36 LAndExp: LAndExp . TOK_AND EqExp
+
+    TOK_AND  shift, and go to state 160
+
+    $default  reduce using rule 33 (LOrExp)
+
+
+state 172
+
+   36 LAndExp: LAndExp TOK_AND EqExp .
+   38 EqExp: EqExp . TOK_EQ RelExp
+   39      | EqExp . TOK_NEQ RelExp
+
+    TOK_EQ   shift, and go to state 161
+    TOK_NEQ  shift, and go to state 162
+
+    $default  reduce using rule 36 (LAndExp)
+
+
+state 173
+
+   38 EqExp: EqExp TOK_EQ RelExp .
+   41 RelExp: RelExp . RelOp AddExp
+
+    TOK_GE   shift, and go to state 163
+    TOK_GEQ  shift, and go to state 164
+    TOK_LE   shift, and go to state 165
+    TOK_LEQ  shift, and go to state 166
+
+    $default  reduce using rule 38 (EqExp)
+
+    RelOp  go to state 167
+
+
+state 174
+
+   39 EqExp: EqExp TOK_NEQ RelExp .
+   41 RelExp: RelExp . RelOp AddExp
+
+    TOK_GE   shift, and go to state 163
+    TOK_GEQ  shift, and go to state 164
+    TOK_LE   shift, and go to state 165
+    TOK_LEQ  shift, and go to state 166
+
+    $default  reduce using rule 39 (EqExp)
+
+    RelOp  go to state 167
+
+
+state 175
+
+   41 RelExp: RelExp RelOp AddExp .
+   43 AddExp: AddExp . AddOp MulExp
+
+    TOK_PLUS   shift, and go to state 81
+    TOK_MINUS  shift, and go to state 82
+
+    $default  reduce using rule 41 (RelExp)
+
+    AddOp  go to state 83
+
+
+state 176
+
+   84 IfStmt: TOK_IF TOK_LPAREN Cond TOK_RPAREN Stmt . TOK_ELSE Stmt
+   85       | TOK_IF TOK_LPAREN Cond TOK_RPAREN Stmt .
+
+    TOK_ELSE  shift, and go to state 178
+
+    $default  reduce using rule 85 (IfStmt)
+
+
+state 177
+
+   88 WhileStmt: TOK_WHILE TOK_LPAREN Cond TOK_RPAREN Stmt .
+
+    $default  reduce using rule 88 (WhileStmt)
+
+
+state 178
+
+   84 IfStmt: TOK_IF TOK_LPAREN Cond TOK_RPAREN Stmt TOK_ELSE . Stmt
+
+    TOK_IDENT        shift, and go to state 12
+    TOK_INT_CONST    shift, and go to state 48
+    TOK_FLOAT_CONST  shift, and go to state 49
+    TOK_SEMICOLON    shift, and go to state 98
+    TOK_LBRACE       shift, and go to state 73
+    TOK_LPAREN       shift, and go to state 50
+    TOK_IF           shift, and go to state 100
+    TOK_WHILE        shift, and go to state 101
+    TOK_BREAK        shift, and go to state 102
+    TOK_CONTINUE     shift, and go to state 103
+    TOK_RETURN       shift, and go to state 104
+    TOK_PLUS         shift, and go to state 51
+    TOK_MINUS        shift, and go to state 52
+    TOK_NOT          shift, and go to state 53
+
+    Exp           go to state 107
+    AddExp        go to state 55
+    MulExp        go to state 56
+    UnaryExp      go to state 57
+    FuncCall      go to state 58
+    PrimaryExp    go to state 59
+    LVal          go to state 108
+    Block         go to state 109
+    Stmt          go to state 179
+    IfStmt        go to state 113
+    ReturnStmt    go to state 114
+    WhileStmt     go to state 115
+    BreakStmt     go to state 116
+    ContinueStmt  go to state 117
+    Number        go to state 61
+    UnaryOp       go to state 62
+    IDENT         go to state 63
+
+
+state 179
+
+   84 IfStmt: TOK_IF TOK_LPAREN Cond TOK_RPAREN Stmt TOK_ELSE Stmt .
+
+    $default  reduce using rule 84 (IfStmt)
